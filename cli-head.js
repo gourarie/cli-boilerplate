@@ -120,7 +120,7 @@ const help = (error, command) => {
 }
 
 
-const promiseWrap = (v)=> v instanceof Promise ? v : Promise.resolve(v)
+const promiseWrap = (v) => v instanceof Promise ? v : Promise.resolve(v)
 
 const commands = {}
 module.exports = {
@@ -131,7 +131,7 @@ module.exports = {
           const _commands = require(join(dirPath, commandMoudleName));
           _commands.forEach(cmd => {
             cmd.noptions = {};
-            cmd.options.forEach(o=>cmd.noptions[o.name]=o.noption)
+            cmd.options.forEach(o => cmd.noptions[o.name] = o.noption)
             commands[cmd.name] = cmd
           })
         } catch (error) {
@@ -142,53 +142,69 @@ module.exports = {
       log.error(error)
     }
   },
-  addCommand: (cmd)=>commands[cmd.name] = cmd,
-  runProgram: ()=>{
+  addCommand: (cmd) => commands[cmd.name] = cmd,
+  runProgram: () => {
     var remain = parsed.argv.remain.concat()
     let _tryCmd = remain.shift();
     let cmds = Object.keys(commands).filter(cmd => cmd.startsWith(_tryCmd))
-    
+
     if (parsed.help || !cmds.length) {
       help();
       process.exit();
     }
-    
+
     if (cmds.length > 1) {
       console.log(`${EOL}Not sure what you mean when you say ${color(_tryCmd, "yellow")}${EOL}What i have is:`)
       cmds.forEach(commandName => console.log(`   ${commandUsageLine(commands[commandName])}`))
       process.exit();
     }
-    
+
     let selectedCommand = commands[cmds.pop()];
     const commandArgs = nopt(selectedCommand.noptions, {}, process.argv, 3)
-    
+
     if (selectedCommand.remain) {
-      commandArgs.argv.$$remain = (selectedCommand.remain.transform || (()=>{}))(commandArgs.argv.remain)
+      commandArgs.argv.$$remain = (selectedCommand.remain.transform || (() => { }))(commandArgs.argv.remain)
     }
 
     if ((commandArgs.argv.$$remain instanceof Object) && !(commandArgs.argv.$$remain instanceof Array)) {
       Object.assign(commandArgs, commandArgs.argv.$$remain)
     }
-      
+
     if (selectedCommand.remain && selectedCommand.remain.required && !commandArgs.argv.remain.length) {
       help(`${selectedCommand.remain.name} is required!`, selectedCommand)
       process.exit();
     }
 
-    selectedCommand.options.forEach((option)=>{
-        if (option.default && typeof(commandArgs[option.name]) === "undefined") commandArgs[option.name] = option.default;
-        if (option.required && typeof(commandArgs[option.name]) === "undefined") {
-          help(`${option.name} is required!`, selectedCommand)
-        }
+    selectedCommand.options.forEach((option) => {
+      if (option.default && typeof (commandArgs[option.name]) === "undefined") commandArgs[option.name] = option.default;
+      if (option.required && typeof (commandArgs[option.name]) === "undefined") {
+        help(`${option.name} is required!`, selectedCommand)
+      }
     })
-    
+
     const {
-      onBeforeStart = (args)=>Promise.resolve(args),
-      handler = ()=>(args)=>Promise.resolve(),
-      onBeforeClose = ()=>Promise.resolve(),
+      onBeforeStart = (args) => Promise.resolve(args),
+      handler = () => (args) => Promise.resolve(),
+      onBeforeClose = () => Promise.resolve(),
     } = selectedCommand;
 
+    process
+      .on('unhandledRejection', (reason, p) => {
+        console.log(color(reason.stack, "dark_red"));
+        console.log(color(`program failed with unhandled error`, "red"));
+        process.exit(1);
+      })
+      .on('uncaughtException', (error) => {
+        if (!(error instanceof Error)) {
+          error = new Error(`command throws none-Error error "${error}"`)
+        }
+        console.log(color(error.stack, "dark_red"));
+        console.log(color(`program failed with unhandled error`, "red"));
+        process.exit(1);
+      });
+
     promiseWrap(onBeforeStart(commandArgs))
-    .then(_args=>promiseWrap(handler(_args || commandArgs)).then((res)=>onBeforeClose(res, _args || commandArgs)))
+      .then(_args => promiseWrap(handler(_args || commandArgs)).then((res) => onBeforeClose(res, _args || commandArgs)))
+
   }
 }

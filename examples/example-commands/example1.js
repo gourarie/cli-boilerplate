@@ -37,6 +37,7 @@ module.exports = [
             log.info("Runnin example2. will return a random in 2 seconds");
             return new Promise((resolve, reject)=>{
                 setTimeout(()=>{
+                    throw "test"
                     resolve(Math.random())
                 }, 2000)
             })
