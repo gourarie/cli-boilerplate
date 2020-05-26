@@ -1,0 +1,23 @@
+{
+  "name": "cli-head",
+  "version": "1.0.0",
+  "description": "Simplified cli program head, using nopt as parser",
+  "main": "cli-head.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gourarie/cli-boilerplate.git"
+  },
+  "author": "chenga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gourarie/cli-boilerplate/issues"
+  },
+  "homepage": "https://github.com/gourarie/cli-boilerplate#readme",
+  "dependencies": {
+    "chillogger": "^1.0.106",
+    "nopt": "^4.0.3"
+  }
+}
