@@ -124,7 +124,7 @@ const promiseWrap = (v)=> v instanceof Promise ? v : Promise.resolve(v)
 
 const commands = {}
 module.exports = {
-  loadCommandsDir: (dirPath = join(__dirname, "commands")) => {
+  loadCommandsDir: (dirPath = join(process.cwd(), "commands")) => {
     try {
       readdirSync(dirPath).forEach(commandMoudleName => {
         try {

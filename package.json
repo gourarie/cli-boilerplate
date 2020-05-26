@@ -1,6 +1,6 @@
 {
   "name": "cli-head",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simplified cli program head, using nopt as parser",
   "main": "cli-head.js",
   "scripts": {
