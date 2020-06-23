@@ -1,6 +1,6 @@
 {
   "name": "cli-head",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simplified cli program head, using nopt as parser",
   "main": "cli-head.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/gourarie/cli-head#readme",
   "dependencies": {
-    "chillogger": "^1.0.106",
+    "chillogger": "^1.0.107",
     "nopt": "^4.0.3"
   },
   "keywords": [

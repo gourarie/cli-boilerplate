@@ -16,7 +16,13 @@ module.exports = [
                 description: "can mark as required, and assign default value",
                 noption: Number,
                 required: true,
-                default: 2
+                default: 2,
+            },
+            {
+                name: "transform",
+                description: "will multiply by a 1000",
+                noption: Number,
+                transform:v=>v*1000
             }
         ],
         remain: {
@@ -34,7 +40,8 @@ module.exports = [
             return args
         },
         handler: (args) => {
-            log.info("Runnin example2. will return a random in 2 seconds");
+
+            log.info("Runnin example2. will return a random in 2 seconds",args);
             return new Promise((resolve, reject)=>{
                 setTimeout(()=>{
                     throw "test"

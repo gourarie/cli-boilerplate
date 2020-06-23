@@ -43,10 +43,11 @@ module.exports = [
             },
             {
                 name: "number",
-                description: "can mark as required, and assign default value",
+                description: "can mark as required, and assign default value; will be multiplied by 1000",
                 noption: Number,
                 required: true,
-                default: 2
+                default: 2,
+                transform: (v)=>v*1000
             }
         ],
         remain: {

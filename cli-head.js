@@ -101,7 +101,7 @@ const commandUsageLine = (command) => {
     command.description;
 }
 
-const help = (error, command) => {
+const help = (command, error) => {
   if (error) console.log(color(EOL + error, `red`))
   if (command) {
     console.log(`${EOL}Usage: ${commandUsageLine(command)}`)
@@ -148,11 +148,8 @@ module.exports = {
     let _tryCmd = remain.shift();
     let cmds = Object.keys(commands).filter(cmd => cmd.startsWith(_tryCmd))
 
-    if (parsed.help || !cmds.length) {
-      help();
-      process.exit();
-    }
-
+    if (!cmds.length) return help()
+    
     if (cmds.length > 1) {
       console.log(`${EOL}Not sure what you mean when you say ${color(_tryCmd, "yellow")}${EOL}What i have is:`)
       cmds.forEach(commandName => console.log(`   ${commandUsageLine(commands[commandName])}`))
@@ -160,6 +157,8 @@ module.exports = {
     }
 
     let selectedCommand = commands[cmds.pop()];
+    
+    if (parsed.help) return help(selectedCommand)
     const commandArgs = nopt(selectedCommand.noptions, {}, process.argv, 3)
 
     if (selectedCommand.remain) {
@@ -171,14 +170,15 @@ module.exports = {
     }
 
     if (selectedCommand.remain && selectedCommand.remain.required && !commandArgs.argv.remain.length) {
-      help(`${selectedCommand.remain.name} is required!`, selectedCommand)
+      help(selectedCommand, `${selectedCommand.remain.name} is required!`)
       process.exit();
     }
 
     selectedCommand.options.forEach((option) => {
+      if (option.transform && typeof (commandArgs[option.name]) !== "undefined") commandArgs[option.name] = option.transform(commandArgs[option.name]);
       if (option.default && typeof (commandArgs[option.name]) === "undefined") commandArgs[option.name] = option.default;
       if (option.required && typeof (commandArgs[option.name]) === "undefined") {
-        help(`${option.name} is required!`, selectedCommand)
+        help(selectedCommand, `${option.name} is required!`)
       }
     })
 
@@ -204,7 +204,7 @@ module.exports = {
       });
 
     promiseWrap(onBeforeStart(commandArgs))
-      .then(_args => promiseWrap(handler(_args || commandArgs)).then((res) => onBeforeClose(res, _args || commandArgs)))
-
+      .then(_args => promiseWrap(handler(_args || commandArgs)))
+      .then((res) => onBeforeClose(res, _args || commandArgs))
   }
 }
