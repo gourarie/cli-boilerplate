@@ -204,7 +204,7 @@ module.exports = {
       });
 
     promiseWrap(onBeforeStart(commandArgs))
-      .then(_args => promiseWrap(handler(_args || commandArgs)))
-      .then((res) => onBeforeClose(res, _args || commandArgs))
+      .then(_args => promiseWrap(handler(_args || commandArgs))
+      .then((res) => onBeforeClose(res, _args || commandArgs)))
   }
 }
